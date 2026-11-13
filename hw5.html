@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Lighting & Shading</title>
+  <style>
+    body { background: #111; color: #ccc; font-family: monospace; }
+    canvas { border: 1px solid #444; }
+    .layout { display: flex; gap: 10px; align-items: flex-start; }
+    .editors { display: flex; flex-direction: column; gap: 10px; }
+    textarea {
+      background: #222;
+      color: #0f0;
+      font: 14px monospace;
+      width: 400px;
+      height: 200px;
+      box-sizing: border-box;
+    }
+    #shaderError { color: #f66; white-space: pre-wrap; width: 400px; margin: 0; }
+    .controls { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+    .control-row { display: flex; align-items: center; gap: 10px; }
+  </style>
+</head>
+
+<body>
+  <h2>Hierarchical Model with One Light</h2>
+  <p>Edit the shaders on the left; the canvas updates as you type.<br>
+    Drag with the mouse to rotate the model.<br>
+    Use the arrow keys and w, s keys to move the camera.<br>
+    Use the slider and dropdown to rotate about an axis; the button starts/stops spinning.</p>
+
+  <div class="layout">
+    <div class="editors">
+      <div>
+        <b>Vertex Shader</b><br>
+        <textarea id="vertEditor" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <b>Fragment Shader</b><br>
+        <textarea id="fragEditor" spellcheck="false"></textarea>
+      </div>
+      <pre id="shaderError"></pre>
+    </div>
+
+    <div>
+      <canvas id="glcanvas" width="400" height="400"></canvas>
+
+      <div class="controls">
+        <div class="control-row">
+          <select id="axisSelect">
+            <option value="x">X Rotation</option>
+            <option value="y">Y Rotation</option>
+            <option value="z">Z Rotation</option>
+          </select>
+          <button id="spinButton">Start/Stop Rotation</button>
+        </div>
+        <div class="lighting">
+          <div id="lightMovements">
+            <div>
+              <label for="lightSlider">Light Rotation: <span id="lightVal">0&deg</span></label>
+              <input type="range" id="lightSlider" min="0" max="360" steps="5" value="0">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="transforms.js"></script>
+  <script src="models.js"></script>
+  <script src="main.js"></script>
+</body>
+
+</html>
