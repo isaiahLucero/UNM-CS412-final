@@ -15,6 +15,10 @@ sandbox/              # test scene: seafloor + follow camera (to be replaced)
 assets/submarine/     # Blender model of the submarine
 ```
 
+## 📦 ES modules
+
+Unlike our homework, which loaded each file with a plain `<script>` tag, this code uses `import` / `export` (ES modules). With several people adding files, this keeps everyone's functions and variables from clashing in the global scope. To add your code, put `export` in front of the functions you want to share and `import` them where you need them. This is also why the page has to be opened through a local server.
+
 ## ▶️ Run
 
 ```bash
@@ -23,3 +27,7 @@ python3 -m http.server 8000
 ```
 
 Open http://localhost:8000/sandbox/ and click the canvas once.
+
+## 🛠️ Tools
+
+Built with help from Claude Code. The 3D model was made in Blender with Blender MCP.
