@@ -8,11 +8,15 @@ Please take a look at the code. We'll build the ocean scene, camera, and objects
 
 ```
 src/
-├── submarine/        # submarine + robotic arm (API: src/submarine/README.md)
-├── math/             # homework matrix library (ES modules)
-└── geometry/         # homework primitive shapes (cube, cylinder, sphere...)
-sandbox/              # current test scene: renderer, seafloor, follow camera
-assets/submarine/     # Blender model of the submarine
+├── submarine/            # submarine code (incl. robotic arm)
+├── math/                 # matrix library
+└── geometry/             # shape generators
+sandbox/
+├── main.js               # game loop
+├── renderer.js           # renderer + shader
+├── test-objects.js       # scene + objects code (seafloor, rocks)
+└── follow-camera.js      # camera code
+assets/submarine/         # submarine model
 ```
 
 ## 📦 ES modules
