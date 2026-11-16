@@ -40,18 +40,5 @@ export function buildTestScene() {
     [14, 10, 1.6, 0.7, M.rockDark], [3, -40, 4.0, 0.1, M.rock]
   ]) put('sphere', m, translate(x, FLOOR_Y + s * 0.35, z), rotateY(r), scale(s, s * 0.6, s * 0.8));
 
-  // Pillars at different heights (good depth/turn references)
-  for (const [x, z, h] of [[-5, -28, 6], [6, -6, 3.5], [-20, -20, 9], [22, -30, 5]])
-    put('cylinder', M.pillar, translate(x, FLOOR_Y + h / 2, z), scale(0.6, h / 2, 0.6));
-
-  // "Coral" cones
-  for (const [x, z, h, m] of [[-3, -10, 1.6, M.coral], [-2.2, -10.8, 1.1, M.coral2], [8, -15, 2.0, M.coral], [-12, -4, 1.4, M.coral2]])
-    put('cone', m, translate(x, FLOOR_Y + h / 2, z), scale(0.35, h / 2, 0.35));
-
-  // A crate on the floor (future grab target) and a floating buoy at mid-depth.
-  put('cube', M.crate, translate(2, FLOOR_Y + 0.35, -12), rotateY(0.5), scale(0.35, 0.35, 0.35));
-  put('sphere', M.buoy, translate(-6, 7, -18), scale(0.6, 0.6, 0.6));
-  put('cylinder', M.rockDark, translate(-6, 3.3, -18), rotateZ(0.02), scale(0.03, 3.3, 0.03));
-
   return items;
 }

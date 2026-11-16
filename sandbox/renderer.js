@@ -131,7 +131,13 @@ export function createRenderer(canvas) {
     gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
   }
 
-  return { gl, beginFrame, drawMesh };
+  // Registers an extra shape under a new key so drawMesh can draw it (e.g. the sea life's tapered vent).
+  // data is the same format as the primitives: { positions, normals, tangents, texCoords, indices }.
+  function addMesh(key, data) {
+    meshes[key] = createMesh(gl, data);
+  }
+
+  return { gl, beginFrame, drawMesh, addMesh };
 }
 
 function compile(gl, type, source) {

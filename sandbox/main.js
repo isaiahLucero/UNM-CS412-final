@@ -6,6 +6,10 @@ import { compose, translate, scale, rotateX, add } from '../src/math/transforms.
 import { createRenderer } from './renderer.js';
 import { FollowCamera } from './follow-camera.js';
 import { buildTestScene, FLOOR_Y } from './test-objects.js';
+import { cylinderObstacle } from '../src/creatures/creatures.js';
+import { createSpawner, scatterScenery } from '../src/creatures/spawner.js';
+import { createSeaLife } from '../src/creatures/sea-life.js';
+import { SEA_MESHES } from '../src/creatures/sea-shapes.js';
 
 const canvas = document.getElementById('glcanvas');
 const fatal = document.getElementById('fatal');
@@ -26,6 +30,46 @@ const sub = new Submarine({
 const controls = new KeyboardControls();
 const camera = new FollowCamera(canvas, { floorY: FLOOR_Y });
 const scene = buildTestScene();
+
+
+// ---------- Sea life: fish, schools, jellyfish, coral and vents (src/creatures) ----------
+// Register the sea life's extra shape (the tapered vent) so the renderer can draw it
+for (const [key, data] of Object.entries(SEA_MESHES)) renderer.addMesh(key, data);
+
+const seaLife = createSeaLife();
+
+// Keep-out zones for the rocks in test-objects.js, so fish don't swim through them
+// and no coral lands on top of them. [x, z, radius, top]
+const propZones = [
+  [-8, -14, 2.2, 2.1], [10, -22, 3.0, 2.9], [-16, 6, 2.6, 2.5], [14, 10, 1.6, 1.5], [3, -40, 4.0, 3.8]
+].map(([x, z, r, top]) => cylinderObstacle(x, z, r, FLOOR_Y + top));
+
+// A few pieces right in front of the starting spot, then more scattered across the whole floor.
+// scatterScenery keeps clear of the props, these pieces and the sub's start (0, 6).
+seaLife.addCoral(-4, -5, FLOOR_Y);
+seaLife.addCoral(5, -9, FLOOR_Y, 1.2);
+seaLife.addVent(-12, -18, FLOOR_Y, 1.3);
+seaLife.addVent(12, -4, FLOOR_Y);
+scatterScenery(seaLife, {
+  corals: 40, vents: 10, floorY: FLOOR_Y,
+  bounds: [-110, 110, -110, 110],                     // the floor is 240 m across; stay a little inside its edge
+  keepClear: [...propZones, ...seaLife.obstacles, { x: 0, z: 6, r: 4 }]
+});
+const obstacles = [...seaLife.obstacles, ...propZones];
+
+// The crowd of fish, schools and jellyfish that lives around the sub and gets recycled as you explore
+const spawner = createSpawner(seaLife, {
+  center: () => sub.getPosition(),
+  floorY: FLOOR_Y,
+  ceilingY: 40,                                       // same as the sub's maxY, the top of the water here
+  bounds: [-110, 110, -110, 110],
+  obstacles
+});
+
+// The sub, in the shape creatures swerve around (anything with pos and size). pos is refreshed every frame.
+const subForFish = { pos: sub.getPosition(), size: 2.5 };
+// ---------- end of sea life setup ----------
+
 
 const debugToggle = document.getElementById('showDebug');
 const markerMat = (emissive) => ({ color: [0, 0, 0], diffuse: 0, specular: 0, shininess: 1, emissive });
@@ -67,6 +111,10 @@ function frame(ms) {
   sub.update(dt, controls.getInput());
   const view = camera.update(dt, sub);
 
+  // Sea life: recycle creatures that fell far behind, then move them all (they swerve around the sub too)
+  subForFish.pos = sub.getPosition();
+  spawner.update(dt, { obstacles, others: [subForFish] });
+
   // Sandbox lights ride along with the sub so it's always readable.
   const p = sub.getPosition();
   renderer.beginFrame(view, [
@@ -76,6 +124,7 @@ function frame(ms) {
 
   for (const item of scene) renderer.drawMesh(item.mesh, item.matrix, item.material);
   sub.forEachDrawable((mesh, matrix, material) => renderer.drawMesh(mesh, matrix, material));
+  seaLife.forEachDrawable(t, (mesh, matrix, material) => renderer.drawMesh(mesh, matrix, material));  // sea life
 
   if (debugToggle.checked) {
     // Claw grab point and light-mount beam axis, drawn from the public API only.
@@ -94,3 +143,4 @@ requestAnimationFrame(frame);
 
 // Let teammates poke at it from the console: window.sub.getForward(), etc.
 window.sub = sub;
+window.sea = { spawner, seaLife, obstacles };
