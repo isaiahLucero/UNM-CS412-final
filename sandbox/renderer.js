@@ -155,14 +155,15 @@ export function createRenderer(canvas) {
 
   const program = makeProgram(gl, VERTEX_SHADER, FRAGMENT_SHADER);
   const waterProgram = makeProgram(gl, ABOVESEA_VS, ABOVESEA_FS);
+  gl.useProgram(waterProgram);
+  const watLoc = {};
+  for(const k of ['uModelView', 'uProjection', 'uLightPos', 'uColor', 
+    't']) watLoc[k] = gl.getUniformLocation(waterProgram, k);
   gl.useProgram(program);
   const loc = {};
   for (const k of ['uModelView', 'uProjection', 'uLightPosA', 'uLightPosB', 'uLightColorA',
     'uLightColorB', 'uAmbient', 'uColor', 'uDiffuse', 'uSpecular', 'uShininess', 'uEmissive',
-    'uFogColor', 'uFogDensity']) loc[k] = gl.getUniformLocation(program, k);
-  const watLoc = {};
-  for(const k of ['uModelView', 'uProjection', 'uLightPos', 'uColor', 
-    't']) watLoc[k] = gl.getUniformLocation(program, k); 
+    'uFogColor', 'uFogDensity']) loc[k] = gl.getUniformLocation(program, k); 
   const meshes = {
     cube: createMesh(gl, createCube()),
     cylinder: createMesh(gl, createCylinder(36, 1)),
@@ -218,14 +219,16 @@ export function createRenderer(canvas) {
     gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
   }
 
+  gl.useProgram(waterProgram);
   function drawWater(meshKey, world, mat){
-    const waterMesh = meshes[meshKey]; 
+    const waterMesh = waterMesh[meshKey]; 
     if(!mesh) return;
     gl.uniformMatrix4fv(watLoc.uModelView, false, multiply(view, world));
     gl.uniform3fv(watLoc.uColor, mat.color);
     gl.bindVertexArray(waterMesh.vao);
     gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
   }
+  gl.useProgram(program);
 
   return { gl, beginFrame, drawMesh, drawWater };
 }
