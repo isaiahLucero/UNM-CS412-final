@@ -141,9 +141,9 @@ export function createPlane(segments=10000, length=64){
   const sideSeg = Math.ceil(Math.sqrt(segments)); // Segment length for each side
   const segmentLength = length / sideSeg;
 
-  for(i = 0; i <= sideSeg; i++){
+  for(let i = 0; i <= sideSeg; i++){
     const x = i * segmentLength;
-    for(j = 0; j <= sideSeg; j++){
+    for(let j = 0; j <= sideSeg; j++){
       const z = j * segmentLength;
       p.push(x, 0, z); // y is constantly zero
       n.push(0, 1, 0);  t.push(0,0,0); u.push(0,0,0);

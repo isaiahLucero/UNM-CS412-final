@@ -74,7 +74,10 @@ function frame(ms) {
     { position: add(p, [-8, 4, -7]), color: [0.35, 0.6, 0.9] }
   ]);
 
-  for (const item of scene) renderer.drawMesh(item.mesh, item.matrix, item.material);
+  for (const item of scene) {
+    if(item == 2) renderer.drawWater(item.mesh, item.Matrix, item.material);
+    renderer.drawMesh(item.mesh, item.matrix, item.material);
+  }
   sub.forEachDrawable((mesh, matrix, material) => renderer.drawMesh(mesh, matrix, material));
 
   if (debugToggle.checked) {
