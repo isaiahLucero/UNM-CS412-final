@@ -3,9 +3,90 @@
 // eye space, inverse-transpose normals, hw5 material uniforms, plus a simple
 // distance fog so the sandbox reads as "underwater".
 
-import { createCube, createCylinder, createSphere, createCone, createTorus }
+import { createCube, createCylinder, createSphere, createCone, createTorus, createPlane }
   from '../src/geometry/primitives.js';
 import { multiply, perspective, transformPoint } from '../src/math/transforms.js';
+
+const ABOVESEA_VS = `#version 300 es
+in vec3 aPosition;
+in vec3 aNormal;
+
+uniform mat4 uModelView;
+uniform mat4 uProjection;
+uniform float t;
+
+out vec3 vPosition;
+out vec3 vNormal;
+
+float random (vec2 st) {
+  return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+}
+
+void main() {
+  float summation = 0.0;
+  float summationX = 0.0;
+  float summationZ = 0.0;
+  float amp = 0.01;
+  float frequency = 2.0 / 1.0;
+  float phase = 2.0 * frequency;
+  int maxWaves = 12;
+
+  for(int i = 0; i < maxWaves; i++){
+    float angle = random(vec2(float(i), 1.0)) * 6.28318;
+    vec2 dir = vec2(cos(angle), sin(angle));
+    
+    summation += amp * sin(dot(aPosition.xz, dir) * frequency + t * phase);
+    summationX += frequency * dir.x * amp * cos(dot(aPosition.xz, dir) * frequency + t * phase);
+    summationZ += frequency * dir.y * amp * cos(dot(aPosition.xz, dir) * frequency + t * phase);
+
+    amp *= 0.5;
+    frequency *= 1.8;
+    phase *= 1.1;
+  }
+
+  vec3 finalPos = vec3(aPosition.x, aPosition.y + summation, aPosition.z);
+  vec3 finalNrm = vec3(-summationX, 1.0, -summationZ);
+
+  vec4 p = uModelView * vec4(finalPos, 1.0);
+  vPosition = p.xyz;
+  vNormal = mat3(uModelView) * finalNrm;
+  gl_Position = uProjection * p;
+}
+`;
+
+const ABOVESEA_FS = `#version 300 es
+precision mediump float;
+
+in vec3 vPosition;
+in vec3 vNormal;
+
+uniform vec3 uLightPos;   // eye space
+uniform vec3 uColor;
+
+out vec4 fragColor;
+
+void main() {
+  vec3 N = normalize(vNormal);
+  vec3 V = normalize(-vPosition);
+  vec3 L = normalize(uLightPos - vPosition);
+  vec3 R = reflect(-L, N);
+
+  vec3 Ka = 0.35 * uColor;
+  float diff = max(dot(N, L), 0.0);
+  vec3 diffuse = 0.35 * uColor * diff;
+  vec3 waterColor = Ka + diffuse;
+
+  float fresnel = 0.02 + 0.98 * pow(1.0 - max(dot(N,V), 0.0), 4.0);
+  vec3 skyColor = vec3(0.45, 0.88, 0.98);
+  vec3 surfaceColor = mix(waterColor, skyColor, fresnel * 0.85);
+
+  float shininess = 180.0;
+  float spec = pow(max(dot(V,R), 0.0), shininess);
+  vec3 specular = vec3(1.4) * spec;
+
+  fragColor = vec4(surfaceColor + specular, 1.0);
+}
+`;
 
 const VERTEX_SHADER = `#version 300 es
 precision highp float;
@@ -73,18 +154,19 @@ export function createRenderer(canvas) {
   if (!gl) throw new Error('WebGL2 is unavailable. Use an up-to-date Chrome, Firefox or Safari.');
 
   const program = makeProgram(gl, VERTEX_SHADER, FRAGMENT_SHADER);
+  const waterProgram = makeProgram(gl, ABOVESEA_VS, ABOVESEA_FS);
   gl.useProgram(program);
   const loc = {};
   for (const k of ['uModelView', 'uProjection', 'uLightPosA', 'uLightPosB', 'uLightColorA',
     'uLightColorB', 'uAmbient', 'uColor', 'uDiffuse', 'uSpecular', 'uShininess', 'uEmissive',
     'uFogColor', 'uFogDensity']) loc[k] = gl.getUniformLocation(program, k);
-
+  for(const k of []) loc[k] = gl.getUniformLocation(program, k);
   const meshes = {
     cube: createMesh(gl, createCube()),
     cylinder: createMesh(gl, createCylinder(36, 1)),
     sphere: createMesh(gl, createSphere(32, 18)),
     cone: createMesh(gl, createCone(36, 8)),
-    torus: createMesh(gl, createTorus(0.77, 0.32, 40, 16))
+    torus: createMesh(gl, createTorus(0.77, 0.32, 40, 16)),
   };
 
   gl.enable(gl.DEPTH_TEST);
@@ -129,6 +211,10 @@ export function createRenderer(canvas) {
     gl.uniform3fv(loc.uEmissive, mat.emissive || [0, 0, 0]);
     gl.bindVertexArray(mesh.vao);
     gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
+  }
+
+  function drawWater(meshKey, world, mat){
+
   }
 
   return { gl, beginFrame, drawMesh };
