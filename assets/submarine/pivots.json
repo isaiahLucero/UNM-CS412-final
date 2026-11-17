@@ -1,0 +1,187 @@
+{
+  "about": "Pivot of each part relative to its parent in the code hierarchy (src/submarine/submarine-model.js), in glTF coordinates (+Y up, nose -Z, metres). Mesh vertices in submarine.glb are in each part's joint-local frame (all joint angles 0); the GLB node transforms hold the stowed rest pose. restRotationDeg is [x, y, z] applied as Ry*Rx*Rz, matching scene-node.js. For the joints it is the stowed pose from ARM_JOINT_DEFS; lightMount's -11.46 deg about X is a fixed tilt, not a joint.",
+  "units": "metres",
+  "up": "+Y",
+  "forward": "-Z",
+  "parts": {
+    "Sub_Hull": {
+      "codeNode": "hull",
+      "parent": null,
+      "translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "restRotationDeg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "joint": null
+    },
+    "Sub_Propeller": {
+      "codeNode": "propeller",
+      "parent": "Sub_Hull",
+      "translation": [
+        0.0,
+        0.0,
+        2.45
+      ],
+      "restRotationDeg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "joint": "spin about local Z"
+    },
+    "Sub_LightMount": {
+      "codeNode": "lightMount",
+      "parent": "Sub_Hull",
+      "translation": [
+        0.0,
+        0.48,
+        -1.8
+      ],
+      "restRotationDeg": [
+        -11.4592,
+        0.0,
+        0.0
+      ],
+      "joint": "fixed; beam along local -Z"
+    },
+    "Arm_Base": {
+      "codeNode": "armBase",
+      "parent": "Sub_Hull",
+      "translation": [
+        0.0,
+        -0.68,
+        -1.2
+      ],
+      "restRotationDeg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "joint": "fixed"
+    },
+    "Arm_Shoulder": {
+      "codeNode": "shoulder",
+      "parent": "Arm_Base",
+      "translation": [
+        0.0,
+        -0.2,
+        0.0
+      ],
+      "restRotationDeg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "joint": "yaw: rotation.y"
+    },
+    "Arm_UpperArm": {
+      "codeNode": "upperArm",
+      "parent": "Arm_Shoulder",
+      "translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "restRotationDeg": [
+        8.0,
+        0.0,
+        0.0
+      ],
+      "joint": "pitch: rotation.x"
+    },
+    "Arm_Forearm": {
+      "codeNode": "elbow",
+      "parent": "Arm_UpperArm",
+      "translation": [
+        0.0,
+        0.0,
+        -0.9
+      ],
+      "restRotationDeg": [
+        -135.0,
+        0.0,
+        0.0
+      ],
+      "joint": "elbow pitch: rotation.x"
+    },
+    "Arm_Wrist": {
+      "codeNode": "wrist",
+      "parent": "Arm_Forearm",
+      "translation": [
+        0.0,
+        0.0,
+        -0.7
+      ],
+      "restRotationDeg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "joint": "roll: rotation.z"
+    },
+    "Claw_Palm": {
+      "codeNode": "claw",
+      "parent": "Arm_Wrist",
+      "translation": [
+        0.0,
+        0.0,
+        -0.12
+      ],
+      "restRotationDeg": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "joint": "fixed"
+    },
+    "Claw_FingerL": {
+      "codeNode": "fingerL",
+      "parent": "Claw_Palm",
+      "translation": [
+        -0.1,
+        0.0,
+        -0.1
+      ],
+      "restRotationDeg": [
+        0.0,
+        8.0,
+        0.0
+      ],
+      "joint": "spread: rotation.y (+)"
+    },
+    "Claw_FingerR": {
+      "codeNode": "fingerR",
+      "parent": "Claw_Palm",
+      "translation": [
+        0.1,
+        0.0,
+        -0.1
+      ],
+      "restRotationDeg": [
+        0.0,
+        -8.0,
+        0.0
+      ],
+      "joint": "spread: rotation.y (-)"
+    }
+  },
+  "clawTip": {
+    "parent": "Claw_Palm",
+    "translation": [
+      0.0,
+      0.0,
+      -0.46
+    ],
+    "restTranslation": [
+      0.0,
+      0.0,
+      -0.4565
+    ],
+    "note": "Fingertip midpoint. translation is with the claw closed (spread 0); RoboticArm sets z = -0.1 - 0.36*cos(spread). restTranslation is the stowed 8 deg spread."
+  }
+}

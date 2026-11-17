@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deep-Sea Sub Sandbox</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+            --panel: #0b1626d9; --line: #2c4057; --muted: #8fa5c0; --accent: #65e5d7; --amber: #ffb16e; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: #051018; color: #d4e1ef; overflow: hidden; }
+    #glcanvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
+    .panel { position: absolute; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+             padding: 12px 14px; font-size: 11px; line-height: 1.55; backdrop-filter: blur(4px); }
+    .panel h2 { margin: 0 0 8px; font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: #83b6ed; }
+    #keys { left: 12px; top: 12px; }
+    #telemetry { right: 12px; top: 12px; min-width: 210px; }
+    table { border-collapse: collapse; }
+    td { padding: 1px 0; vertical-align: top; }
+    td:first-child { padding-right: 12px; white-space: nowrap; }
+    kbd { display: inline-block; min-width: 18px; padding: 0 4px; border: 1px solid #3b5777; border-radius: 4px;
+          background: #1a2c42; color: #ecf5ff; text-align: center; font: inherit; }
+    .sub { color: var(--amber); } .arm { color: var(--accent); }
+    .muted { color: var(--muted); }
+    pre { margin: 0; font: inherit; }
+    .row { display: flex; justify-content: space-between; gap: 12px; }
+    .row span:last-child { color: var(--accent); font-variant-numeric: tabular-nums; }
+    label { display: flex; gap: 6px; align-items: center; margin-top: 8px; color: var(--muted); }
+    #fatal { position: absolute; inset: 0; display: none; place-items: center; background: #0c1320f0;
+             color: #ffc3b4; padding: 30px; text-align: center; }
+    @media (max-width: 720px) { #keys { display: none; } }
+  </style>
+</head>
+<body>
+  <canvas id="glcanvas" aria-label="Submarine sandbox"></canvas>
+
+  <section class="panel" id="keys">
+    <h2>Controls</h2>
+    <table>
+      <tr><td class="sub">Thrust</td><td><kbd>W</kbd> <kbd>S</kbd></td></tr>
+      <tr><td class="sub">Turn</td><td><kbd>A</kbd> <kbd>D</kbd></td></tr>
+      <tr><td class="sub">Ascend / descend</td><td><kbd>Space</kbd> <kbd>Shift</kbd></td></tr>
+      <tr><td class="arm">Shoulder yaw</td><td><kbd>J</kbd> <kbd>L</kbd></td></tr>
+      <tr><td class="arm">Upper arm up / down</td><td><kbd>I</kbd> <kbd>K</kbd></td></tr>
+      <tr><td class="arm">Elbow fold / extend</td><td><kbd>U</kbd> <kbd>O</kbd></td></tr>
+      <tr><td class="arm">Wrist roll</td><td><kbd>N</kbd> <kbd>M</kbd></td></tr>
+      <tr><td class="arm">Claw open / close</td><td><kbd>,</kbd> <kbd>.</kbd></td></tr>
+      <tr><td class="arm">Stow arm</td><td><kbd>R</kbd></td></tr>
+      <tr><td class="muted">Camera</td><td class="muted">drag · wheel · dbl-click</td></tr>
+    </table>
+  </section>
+
+  <section class="panel" id="telemetry">
+    <h2>Telemetry</h2>
+    <div class="row"><span>Speed</span><span id="hudSpeed">–</span></div>
+    <div class="row"><span>Height</span><span id="hudDepth">–</span></div>
+    <div class="row"><span>Heading</span><span id="hudHeading">–</span></div>
+    <div class="row"><span>Propeller</span><span id="hudProp">–</span></div>
+    <h2 style="margin-top:10px">Arm joints</h2>
+    <pre id="hudJoints" class="arm">–</pre>
+    <h2 style="margin-top:10px">Claw tip (world)</h2>
+    <pre id="hudTip" class="arm">–</pre>
+    <label><input type="checkbox" id="showDebug" checked> Show claw tip &amp; beam axis</label>
+  </section>
+
+  <div id="fatal" role="alert"></div>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
