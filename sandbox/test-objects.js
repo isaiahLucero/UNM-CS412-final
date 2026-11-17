@@ -34,6 +34,13 @@ export function buildTestScene() {
     put('cube', M.grid, translate(0, FLOOR_Y + 0.005, x), scale(SIZE, 0.005, 0.04));
   }
 
+  // SeaTop : 
+  put('plane', M.grid, translate(0, 42, 0), scale(SIZE, 0.5, SIZE));
+  for(let x = -SIZE; x <= SIZE; x += STEP) {
+    put('cube', M.grid, translate(x, 42 + 0.0005, 0), scale(0.04, 0.005, SIZE));
+    put('cube', M.grid, translate(0, 42 + 0.005, x), scale(SIZE, 0.005, 0.04));
+  }
+
   // Rocks (squashed spheres)
   for (const [x, z, s, r, m] of [
     [-8, -14, 2.2, 0.4, M.rock], [10, -22, 3.0, 1.2, M.rockDark], [-16, 6, 2.6, 2.0, M.rock],

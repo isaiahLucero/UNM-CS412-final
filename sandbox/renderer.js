@@ -160,13 +160,18 @@ export function createRenderer(canvas) {
   for (const k of ['uModelView', 'uProjection', 'uLightPosA', 'uLightPosB', 'uLightColorA',
     'uLightColorB', 'uAmbient', 'uColor', 'uDiffuse', 'uSpecular', 'uShininess', 'uEmissive',
     'uFogColor', 'uFogDensity']) loc[k] = gl.getUniformLocation(program, k);
-  for(const k of []) loc[k] = gl.getUniformLocation(program, k);
+  const watLoc = {};
+  for(const k of ['uModelView', 'uProjection', 'uLightPos', 'uColor', 
+    't']) watLoc[k] = gl.getUniformLocation(program, k); 
   const meshes = {
     cube: createMesh(gl, createCube()),
     cylinder: createMesh(gl, createCylinder(36, 1)),
     sphere: createMesh(gl, createSphere(32, 18)),
     cone: createMesh(gl, createCone(36, 8)),
     torus: createMesh(gl, createTorus(0.77, 0.32, 40, 16)),
+  };
+  const waterMesh = {
+    plane: createMesh(gl, createPlane())
   };
 
   gl.enable(gl.DEPTH_TEST);
@@ -214,10 +219,15 @@ export function createRenderer(canvas) {
   }
 
   function drawWater(meshKey, world, mat){
-
+    const waterMesh = meshes[meshKey]; 
+    if(!mesh) return;
+    gl.uniformMatrix4fv(watLoc.uModelView, false, multiply(view, world));
+    gl.uniform3fv(watLoc.uColor, mat.color);
+    gl.bindVertexArray(waterMesh.vao);
+    gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
   }
 
-  return { gl, beginFrame, drawMesh };
+  return { gl, beginFrame, drawMesh, drawWater };
 }
 
 function compile(gl, type, source) {
