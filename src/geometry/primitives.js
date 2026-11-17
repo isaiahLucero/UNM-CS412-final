@@ -6,6 +6,7 @@
 //   sphere    radius 1
 //   cone      base radius 1 at y=-1, apex at y=+1
 //   torus     major 0.77, tube 0.32, in the XZ plane
+//   plane     lies on XZ plane, length for each side = 60
 function packMesh(pos, nrm, tan, uv, idx) {
   return {
     positions: new Float32Array(pos), normals: new Float32Array(nrm),
@@ -132,5 +133,33 @@ export function createCone(segments=72, levels=32) {
     t.push(1,0,0);u.push(.5+.5*Math.cos(a),.5+.5*Math.sin(a));
   }
   for(let i=0;i<segments;i++) ind.push(center,center+i+1,center+i+2);
+  return packMesh(p,n,t,u,ind);
+}
+
+export function createPlane(segments=10000, length=64){
+  const p=[],n=[],t=[],u=[],ind=[];
+  const sideSeg = Math.ceil(Math.sqrt(segments)); // Segment length for each side
+  const segmentLength = length / sideSeg;
+
+  for(i = 0; i <= sideSeg; i++){
+    const x = i * segmentLength;
+    for(j = 0; j <= sideSeg; j++){
+      const z = j * segmentLength;
+      p.push(x, 0, z); // y is constantly zero
+      n.push(0, 1, 0);  t.push(0,0,0); u.push(0,0,0);
+    }
+  }
+
+  for(let i = 0; i < sideSeg; i++){
+    for(let j = 0; j < sideSeg; j++){
+      const topLeft = i * (sideSeg + 1) + j;
+      const bottomLeft = (i + 1) * (sideSeg + 1) + j;
+      const topRight = topLeft + 1;
+      const bottomRight = bottomLeft + 1;
+      ind.push(topLeft, bottomLeft, topRight);
+      ind.push(bottomLeft, bottomRight, topRight);
+    }
+  }
+
   return packMesh(p,n,t,u,ind);
 }
