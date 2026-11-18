@@ -27,7 +27,7 @@ void main() {
   float summationX = 0.0;
   float summationZ = 0.0;
   float amp = 0.01;
-  float frequency = 2.0 / 1.0;
+  float frequency = 2.0 / 10000.0;
   float phase = 2.0 * frequency;
   int maxWaves = 12;
 
@@ -170,8 +170,6 @@ export function createRenderer(canvas) {
     sphere: createMesh(gl, createSphere(32, 18)),
     cone: createMesh(gl, createCone(36, 8)),
     torus: createMesh(gl, createTorus(0.77, 0.32, 40, 16)),
-  };
-  const waterMesh = {
     plane: createMesh(gl, createPlane())
   };
 
@@ -219,16 +217,19 @@ export function createRenderer(canvas) {
     gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
   }
 
-  gl.useProgram(waterProgram);
-  function drawWater(meshKey, world, mat){
-    const waterMesh = waterMesh[meshKey]; 
-    if(!mesh) return;
+  function drawWater(meshKey, world, mat, t){
+    gl.useProgram(waterProgram);
+    const waterMesh = meshes[meshKey]; 
+    if(!waterMesh) return;
     gl.uniformMatrix4fv(watLoc.uModelView, false, multiply(view, world));
+    gl.uniformMatrix4fv(watLoc.uProjection, false, projection);
     gl.uniform3fv(watLoc.uColor, mat.color);
+    gl.uniform3fv(watLoc.uLightPos, transformPoint(view, [0, 50, 0]));
+    gl.uniform1f(watLoc.t, t);
     gl.bindVertexArray(waterMesh.vao);
-    gl.drawElements(gl.TRIANGLES, mesh.count, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.TRIANGLES, waterMesh.count, gl.UNSIGNED_SHORT, 0);
+    gl.useProgram(program);
   }
-  gl.useProgram(program);
 
   return { gl, beginFrame, drawMesh, drawWater };
 }

@@ -35,11 +35,7 @@ export function buildTestScene() {
   }
 
   // SeaTop : 
-  put('plane', M.grid, translate(0, 42, 0), scale(SIZE, 0.5, SIZE));
-  for(let x = -SIZE; x <= SIZE; x += STEP) {
-    put('plane', M.grid, translate(x, 42 + 0.0005, 0), scale(0.04, 0.005, SIZE));
-    put('plane', M.grid, translate(0, 42 + 0.005, x), scale(SIZE, 0.005, 0.04));
-  }
+  put('plane', M.sand, translate(0, 42, 0), scale(SIZE, 0.5, SIZE));
 
   // Rocks (squashed spheres)
   for (const [x, z, s, r, m] of [

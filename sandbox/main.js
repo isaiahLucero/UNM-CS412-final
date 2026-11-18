@@ -20,7 +20,7 @@ try {
 }
 
 const sub = new Submarine({
-  position: [0, 4, 6],
+  position: [0, 38, 6],
   bounds: { minY: FLOOR_Y + 1.9, maxY: 40 }   // keep the stowed arm off the sandbox floor
 });
 const controls = new KeyboardControls();
@@ -75,8 +75,8 @@ function frame(ms) {
   ]);
 
   for (const item of scene) {
-    if(item == 2) renderer.drawWater(item.mesh, item.Matrix, item.material);
-    renderer.drawMesh(item.mesh, item.matrix, item.material);
+    if(item.mesh == 'plane') renderer.drawWater(item.mesh, item.matrix, item.material, t);
+    else renderer.drawMesh(item.mesh, item.matrix, item.material);
   }
   sub.forEachDrawable((mesh, matrix, material) => renderer.drawMesh(mesh, matrix, material));
 
