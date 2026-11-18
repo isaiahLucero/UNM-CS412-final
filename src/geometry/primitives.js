@@ -136,17 +136,17 @@ export function createCone(segments=72, levels=32) {
   return packMesh(p,n,t,u,ind);
 }
 
-export function createPlane(segments=10000, length=64){
+export function createPlane(segments=60000, length=240){
   const p=[],n=[],t=[],u=[],ind=[];
   const sideSeg = Math.ceil(Math.sqrt(segments)); // Segment length for each side
   const segmentLength = length / sideSeg;
 
-  for(let i = 0; i <= sideSeg; i++){
+  for(let i = -sideSeg/2; i <= sideSeg/2; i++){
     const x = i * segmentLength;
-    for(let j = 0; j <= sideSeg; j++){
+    for(let j = -sideSeg/2; j <= sideSeg/2; j++){
       const z = j * segmentLength;
       p.push(x, 0, z); // y is constantly zero
-      n.push(0, 1, 0);  t.push(0,0,0); u.push(0,0,0);
+      n.push(0, 1, 0);  t.push(0,0,0); u.push(0,0);
     }
   }
 

@@ -18,7 +18,8 @@ const M = {
   coral: mat([0.90, 0.38, 0.35], 0.85, 0.20, 20),
   coral2: mat([0.85, 0.55, 0.85], 0.85, 0.20, 20),
   crate: mat([0.55, 0.38, 0.20], 0.85, 0.15, 16),
-  buoy: mat([0.95, 0.35, 0.10], 0.8, 0.6, 50, [0.12, 0.03, 0.0])
+  buoy: mat([0.95, 0.35, 0.10], 0.8, 0.6, 50, [0.12, 0.03, 0.0]),
+  water: mat([0.01, 0.06, 0.14], 0.1, 0.1, 0.1)
 };
 
 // Returns [{ mesh, matrix, material }]; static, so built once.
@@ -35,7 +36,7 @@ export function buildTestScene() {
   }
 
   // SeaTop : 
-  put('plane', M.sand, translate(0, 42, 0), scale(SIZE, 0.5, SIZE));
+  put('plane', M.water, translate(0, 42, 0));
 
   // Rocks (squashed spheres)
   for (const [x, z, s, r, m] of [

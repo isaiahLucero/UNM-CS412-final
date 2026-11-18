@@ -26,8 +26,8 @@ void main() {
   float summation = 0.0;
   float summationX = 0.0;
   float summationZ = 0.0;
-  float amp = 0.01;
-  float frequency = 2.0 / 10000.0;
+  float amp = 0.5;
+  float frequency = 2.0 / 5.7;
   float phase = 2.0 * frequency;
   int maxWaves = 12;
 
@@ -45,7 +45,7 @@ void main() {
   }
 
   vec3 finalPos = vec3(aPosition.x, aPosition.y + summation, aPosition.z);
-  vec3 finalNrm = vec3(-summationX, 1.0, -summationZ);
+  vec3 finalNrm = normalize(vec3(-summationX * 3.0, 1.0, -summationZ * 3.0));
 
   vec4 p = uModelView * vec4(finalPos, 1.0);
   vPosition = p.xyz;
@@ -67,22 +67,24 @@ out vec4 fragColor;
 
 void main() {
   vec3 N = normalize(vNormal);
+  if (!gl_FrontFacing) N = -N;
   vec3 V = normalize(-vPosition);
   vec3 L = normalize(uLightPos - vPosition);
-  vec3 R = reflect(-L, N);
+  vec3 H = normalize(L + V); // Blinn - Phong
 
-  vec3 Ka = 0.35 * uColor;
+  vec3 Ka = 0.08 * uColor;
   float diff = max(dot(N, L), 0.0);
-  vec3 diffuse = 0.35 * uColor * diff;
+  vec3 diffuse = 1.1 * uColor * diff;
   vec3 waterColor = Ka + diffuse;
+  
+  float cosTheta = clamp(dot(N,V), 0.0, 1.0);
+  float fresnel = 0.02 + 0.98 * pow(1.0 - cosTheta, 5.0) * 0.25;
+  vec3 skyColor = vec3(0.55, 0.85, 0.98);
+  vec3 surfaceColor = mix(waterColor, skyColor, fresnel * 0.5);
 
-  float fresnel = 0.02 + 0.98 * pow(1.0 - max(dot(N,V), 0.0), 4.0);
-  vec3 skyColor = vec3(0.45, 0.88, 0.98);
-  vec3 surfaceColor = mix(waterColor, skyColor, fresnel * 0.85);
-
-  float shininess = 180.0;
-  float spec = pow(max(dot(V,R), 0.0), shininess);
-  vec3 specular = vec3(1.4) * spec;
+  float shininess = 55.0;
+  float spec = pow(max(dot(N, H), 0.0), shininess);
+  vec3 specular = vec3(0.35, 0.95, 1.0) * spec;
 
   fragColor = vec4(surfaceColor + specular, 1.0);
 }
@@ -224,7 +226,7 @@ export function createRenderer(canvas) {
     gl.uniformMatrix4fv(watLoc.uModelView, false, multiply(view, world));
     gl.uniformMatrix4fv(watLoc.uProjection, false, projection);
     gl.uniform3fv(watLoc.uColor, mat.color);
-    gl.uniform3fv(watLoc.uLightPos, transformPoint(view, [0, 50, 0]));
+    gl.uniform3fv(watLoc.uLightPos, transformPoint(view, [-150, 75, -150]));
     gl.uniform1f(watLoc.t, t);
     gl.bindVertexArray(waterMesh.vao);
     gl.drawElements(gl.TRIANGLES, waterMesh.count, gl.UNSIGNED_SHORT, 0);
